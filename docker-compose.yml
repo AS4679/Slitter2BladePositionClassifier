@@ -1,0 +1,12 @@
+version: '3.5'
+
+services:
+  ZM2-DigiCV-SmallDoor-State-Detector:
+    container_name: zm2-digicv-smalldoor-state-detector
+    build: .
+    image: zm2-digicv-smalldoor-state-detector:latest
+    restart: always
+    volumes:
+      - "/home/level2/Documents/services/creds/DigiCVTrend:/home/service/creds"
+      - "/home/level2/Documents/services/ZM2-DigiCV-SmallDoor-State-Detector/imagecache:/home/service/CVPrj_ZM2SmallDoor"
+    command: python -u ZM2_DigiCV_SmallDoorOpen_service.py
