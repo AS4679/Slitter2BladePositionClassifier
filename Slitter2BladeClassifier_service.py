@@ -280,11 +280,3 @@ if __name__ == '__main__':
         cv.destroyAllWindows()
         os._exit(0)
 
-'''
-                encoding labels are as follows
-                if [0,1] then: closed  ::: my key == 0
-                if [1,0] then open  ::: my key == 1
-                after argmax i get the index of the greates probability
-                if index == 1 then key == 0
-                if index == 0 then key == 1
-'''
