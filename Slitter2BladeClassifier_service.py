@@ -21,13 +21,15 @@ import tensorflow as tf
 from keras.preprocessing.image import ImageDataGenerator    #load_img, img_to_array,
 from keras.applications.vgg16 import preprocess_input, decode_predictions
 
+from creds.config import config
+
 # define constants
 project_id = 'Slitter2BladePositionClassifier'
 camera_name = 'Slitter2BladePositionClassifierCamera'
 camip = '10.1.35.44'
 caps_folder = project_id+'/'+camera_name
-
-model_pickle = './resources/Model_151222_IridiumV2.h5'
+# model_pickle = './resources/slitter_model_jan20E5VanadiumExperimental.h5'
+model_pickle = './resources/slitter_model_jan20E5Basic.h5'
 finalRegion = ((0,305),(512,817))
 # define helper functions
 # ---------------------------------------------------------------------------------------------------------------------
@@ -157,7 +159,7 @@ def decodePredict(state):
 
 
 async def get_frame(vcap, sample_rate):
-    classif_mode = False
+    classif_mode = True
     if not classif_mode:
         make_folder(caps_folder+ '/raw')
     now = pd.Timestamp.now()
