@@ -12,12 +12,12 @@ import pickle
 import numpy as np
 from DigiOCVIP import Vidcap
 import sqlalchemy as sqa
-# import creds.config
+import creds.config
 import creds
 from creds import *
 import keras
 import tensorflow as tf
-#TODO : use imdatagenerator to load your pic
+
 from keras.preprocessing.image import ImageDataGenerator    #load_img, img_to_array,
 from keras.applications.vgg16 import preprocess_input, decode_predictions
 
@@ -27,7 +27,11 @@ camera_name = 'Slitter2BladePositionClassifierCamera'
 camip = '10.1.35.44'
 caps_folder = project_id+'/'+camera_name
 
-model_pickle = './resources/Model_151222_IridiumV2.h5'
+# model_pickle = './resources/Model_151222_IridiumV2.h5''slitter_model_jan20E5Basic.h5'
+# model_pickle = './resources/slitter_model_jan20E5Basic.h5'
+# model_pickle = './resources/basic_vanadium_sans_preproccing.h5'
+model_pickle = './resources/slittercroppedmodel_vanadiumBase_v1.h5'
+
 finalRegion = ((0,305),(512,817))
 # define helper functions
 # ---------------------------------------------------------------------------------------------------------------------
@@ -80,55 +84,26 @@ the code automatically resizes the image to be acceptable input for the predicti
 '''
 from keras.preprocessing.image import ImageDataGenerator
 #this is no longer vgg preproccing, might need to add rescaling
-def imCrop2(raw, approxRegion):
-    first,last = approxRegion
-    croppedImg = raw[first[1]:last[1],first[0]:last[0],:]#[305:817,0:512,:] #[first[1]:last[1],first[0]:last[0],:]
+def imCrop2(raw):
+    h, w, _ = raw.shape
+    croppedImg = raw[int(len(raw[0])/5):-1,int(len(raw[0])/2):-1,:]
+    ch, cw, cdep = croppedImg.shape
     # preProcced = tf.keras.applications.vgg16.preprocess_input(croppedImg)
     # im = Image.fromarray(np.uint8(preProcced))
     # im.show('cropped')
     im = Image.fromarray(np.uint8(croppedImg))
-    im.show('cropped')
-    # rescaled = preProcced.rescaled(1./255)          #TODO : RESCALE THE IMAGE
-    # rescaled = ImageDataGenerator().flow(croppedImg,)
-    rescaled = croppedImg / 1. / 255# / 255.
-    if last[0] - first[0] != 512 or last[1] - first[1] != 512:
+    # im.show('cropped')
+    # if ch != 659 or cw != 959:
+    if ch != 695 or cw != 959:
         #execute resize code
-        resizedImg = cv.resize(croppedImg,512,512)#I am 90% percent sure this is the right syntax
-        rescaled = resizedImg / 1. / 255
-        return rescaled
-    return rescaled
-#todo I have confirmed that the mean is hard coded and not derived, I will have to manually implement this and find the mean myself
-""" 
-
-preprocess using vgg algo i found online docs
-https://arxiv.org/abs/1409.1556
-https://www.youtube.com/watch?v=hRKEQhiqIU4
-#please refer to line 59 o fthis gist : https://github.com/tensorflow/tensorflow/blob/r1.5/tensorflow/python/keras/_impl/keras/applications/imagenet_utils.py
-
-"""
-def imCrop3VGG(raw, approxRegion):
-    # tf.keras.applications.vgg16.preprocess_input(croppedImg, mode = 'caffe')
-    # # preProcced = croppedImg
-    # first,last = approxRegion
-    # croppedImg = raw[first[1]:last[1],first[0]:last[0],:]#[305:817,0:512,:] #[first[1]:last[1],first[0]:last[0],:]
-    # # preProcced = tf.keras.applications.vgg16.preprocess_input(croppedImg) #TODO : confirm the contents of this image
-    # im = Image.fromarray(np.uint8(preProcced))
-    # im.show('cropped')
-    # im = Image.fromarray(np.uint8(croppedImg))
-    # im.show('cropped')
-    # # rescaled = preProcced.rescaled(1./255)                                        #TODO : RESCALE THE IMAGE
-    # if last[0] - first[0] != 512 or last[1] - first[1] != 512:
-    #     #execute resize code
-    #     resizedImg = cv.resize(preProcced,512,512)#I am 90% percent sure this is the right syntax
-    #     return croppedImg
-    # # return preProcced
-    # return croppedImg
-    pass
-
-#chge
+        resizedImg = cv.resize(croppedImg,(959, 695), interpolation = cv.INTER_AREA)#I am 90% percent sure this is the right syntax
+        # rescaled = resizedImg / 1. / 255
+        return resizedImg
+    return croppedImg
 def save_state(small_door_state):
+    #todo pay attention to this BOOKMARK
     engine = sqa.create_engine(
-        f'mssql+pymssql://{config.sqluser}:{config.sqlpw}@10.1.16.245',
+        f'mssql+pymssql://{creds.config.sqluser}:{creds.config.sqlpw}@10.1.16.245',
         echo=False  # set to true to spit out all the SQL code in terminal for debugging
     )
     conn = engine.connect()
@@ -157,9 +132,9 @@ def decodePredict(state):
 
 
 async def get_frame(vcap, sample_rate):
-    classif_mode = False
+    classif_mode = True
     if not classif_mode:
-        make_folder(caps_folder+ '/raw')
+        make_folder(caps_folder + '/raw')
     now = pd.Timestamp.now()
     # today_folder = "/"+now.strftime("%Y-%m-%d")
     # make_folder(caps_folder)
@@ -180,52 +155,65 @@ async def get_frame(vcap, sample_rate):
             1: 'small-door open',
             2: 'big door open'
         }
-    small_door_last_state = 0
-    small_door_state = 0
+    slitter_last_state = 0
+    slitter_state_current = 0
     none_cntr = 0
     while 1:
         img = vcap.frame
         if img is not None:
+            img_original = img.copy()
             none_cntr = 0
-            check_bounds = ((457, 170), (535, 311))
             if classif_mode:
-                img = imCrop2(img, finalRegion)
+                img = imCrop2(img)
             # Classify image
             if classif_mode:
-                img = img.reshape(-1,img.shape[0], img.shape[1],img.shape[2])
-                ''' my problem could be with the preprocessing, 
-                test the issue with and without and different rescaling approaches
-                if worst comes to it, we can just use an ImageDataGenerator object  somehow'''
+                print(img.shape)
+                img = img.reshape(-1,695, 959,3)
+                # img = img.reshape(1,img.shape[0], img.shape[1],img.shape[2])
                 state = model.predict(img)
-                state = np.argmax(state, axis=-1)
-                small_door_last_state=small_door_state
-                #the way the labels were trained on the model it thinks [0,1] is closed, therefore trend 0 if argmaxed intex is state == 1
                 print(state)
-                if state[0] == 1:
-                    small_door_state = 0
-                    #closed
+                # state = np.argmax(state, axis=-1)
+                #todo reading is fundamental research the lead s on binary regression to make sure of thsi prediciton issue is secure
+                if state > 0.5:
+                    #maybe its 0.0005
+                    #maybe its 0.00038766
+                    #0.0004
+                    state = 1
+                    #active
                 else:
-                    small_door_state = 1
-                    #open
-                # [1,0]    open +++++++    [0,1]     closed
+                    state = 0
+                    #inactive
+                slitter_last_state=slitter_state_current
+                print(state)
+                if state == 0:
+                    slitter_state_current = 0
+                    #active
+                else:
+                    slitter_state_current = 1
+                    #inactive
+                # 1    active +++++++    0     inactive
                 # Save state to trending if state change
-                if small_door_last_state != small_door_state:
+                if slitter_last_state != slitter_state_current:
                     try:
-                        save_state(small_door_state)#todo find error reason #'name config is not defined'
+                        save_state(slitter_state_current)#todo find error reason #'name config is not defined'
                         print('State trended...')
                     except Exception as e:
                         print('Error trending state...')
                         print(e)
-
                 # Save image
-                if cv.imwrite(caps_folder + "/Cap_" + str(cntr) + "_" +
+                if True:
+                    try:
+                        cv.imwrite(caps_folder + "/Cap_" + str(cntr) + "_" +
                               str(pd.Timestamp.now()).replace(':', '.').replace(' ', 'T') +
                               '_s'+str(state[0]) +
                               '.png',
-                              img
-                              ):
-                    print('image saved')
-                    cntr += 1 #TODO FAILURE TO SAVE IS BECAUSE CODE IS USING PREPROCESSED VERSION OF THE ORIGINAL IMAGE BE WARY AND CORRECT THIS BUG BY TRACKINGORIGINAL IMAGE STATE
+                              img_original
+                              )
+                        print('image saved')
+                        cntr += 1  # TODO FAILURE TO SAVE IS BECAUSE CODE IS USING PREPROCESSED VERSION OF THE ORIGINAL IMAGE BE WARY AND CORRECT THIS BUG BY TRACKINGORIGINAL IMAGE STATE
+                    except Exception as e:
+                        print(e)
+
                 else:
                     print('failed to save image')
 
