@@ -27,10 +27,10 @@ camera_name = 'Slitter2BladePositionClassifierCamera'
 camip = '10.1.35.44'
 caps_folder = project_id+'/'+camera_name
 
-# model_pickle = './resources/Model_151222_IridiumV2.h5''slitter_model_jan20E5Basic.h5'
-# model_pickle = './resources/slitter_model_jan20E5Basic.h5'
-# model_pickle = './resources/basic_vanadium_sans_preproccing.h5'
-model_pickle = './resources/slittercroppedmodel_vanadiumBase_v1.h5'
+
+# model_pickle = './resources/slittercroppedmodel_vanadiumBase_v1.h5'
+
+
 
 finalRegion = ((0,305),(512,817))
 # define helper functions
