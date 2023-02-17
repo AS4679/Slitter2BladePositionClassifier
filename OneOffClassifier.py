@@ -26,16 +26,22 @@ project_id = 'Slitter2BladePositionClassifier'
 camera_name = 'Slitter2BladePositionClassifierCamera'
 camip = '10.1.35.44'
 caps_folder = project_id+'/'+camera_name
-'''PLEASE DO NOT TAKE THE OPINION OF THE ZEROTH GENERATION, THEY ARE NOT GOOD EXCEPT FOR  NUMBER 1'''
-#WORTH ITS SALT!!!!
+
+# model_pickle = './resources/Model_151222_IridiumV2.h5''slitter_model_jan20E5Basic.h5'
+# model_pickle = './resources/slitter_model_jan20E5Basic.h5'
+
+
+
 # model_pickle = './resources/slitter_model_jan20E5Basic.h5'###PERF IS GOOD###TODO[somehow it is is guessing correctly 0 for active despite the image shoiwng a lot of bricks whatever experimental features i added sem to help]yesterday this one was allones and today its all zeroes
-'''
-#IS WORTHELESSS       model_pickle = './resources/basic_vanadium_sans_preproccing.h5'#todo guesses 1 even though it is active kinda dumb, not sure what went wrong, its twin did so much better, I forget how I trained it, docs are allmessed up but its proabley in the commmit history, regardless the paper journal has a better twin already described that trained under similar condtioins so .... meh?
-#IS WORTHELESSS       model_pickle = './resources/basic_vanadium_sans_preproccing.h5'####TODO THIS ONE i HAVE A BAD FEELING ABOUT[error duplicate above more notes...]
-# IS WORTHELESSS       model_pickle = './resources/basic_vanadium.h5'#todo he guesses 1 even though its inactive picture is of 2 bricks and one is currently engaged, this one must  be a renamed version basic vanadium sanspreproccing. idk I dont remember..... eitehr way I am fairly certain he is guessing inactive when is active and others are curretnly provideing the correct guess of active
-'''
+
+model_pickle = './resources/basic_vanadium_sans_preproccing.h5'####TODO THIS ONE i HAVE A BAD FEELING ABOUT[error duplicate above more notes...]
+
+
+# model_pickle = './resources/basic_vanadium.h5'#todo he guesses 1 even though its inactive picture is of 2 bricks and one is currently engaged, this one must  be a renamed version basic vanadium sanspreproccing. idk I dont remember..... eitehr way I am fairly certain he is guessing inactive when is active and others are curretnly provideing the correct guess of active
+
+# model_pickle = './resources/basic_vanadium_sans_preproccing.h5'#todo guesses 1 even though it is active kinda dumb, not sure what went wrong, its twin did so much better, I forget how I trained it, docs are allmessed up but its proabley in the commmit history, regardless the paper journal has a better twin already described that trained under similar condtioins so .... meh?
 # model_pickle = './resources/slitter_model_jan20E5VanadiumExperimental.h5'###PERF IS GOOD#todo APPARENTLY THIS ONE WAS WRITTEN IN CATEGORICAL CROSS ENTROPY MIGHT BE PRETTY GOOD looks good on confidence as it predicted 0 as the asnwer where zero is active and 1 is inactive.... pretty smart
-model_pickle = './resources/slittercroppedmodel_vanadiumBase_v1.h5'
+# model_pickle = './resources/slittercroppedmodel_vanadiumBase_v1.h5'
 
 finalRegion = ((0,305),(512,817))
 # define helper functions
@@ -90,7 +96,7 @@ the code automatically resizes the image to be acceptable input for the predicti
 def imCrop2(raw):
     h, w, _ = raw.shape
     im = Image.fromarray(np.uint8(raw))
-    # im.show('cropped')
+    im.show('cropped')
     # if ch != 695 or cw != 959:
     if False:
         #execute resize code
