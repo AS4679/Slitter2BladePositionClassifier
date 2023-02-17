@@ -29,13 +29,22 @@ caps_folder = project_id+'/'+camera_name
 '''PLEASE DO NOT TAKE THE OPINION OF THE ZEROTH GENERATION, THEY ARE NOT GOOD EXCEPT FOR  NUMBER 1'''
 #WORTH ITS SALT!!!!
 # model_pickle = './resources/slitter_model_jan20E5Basic.h5'###PERF IS GOOD###TODO[somehow it is is guessing correctly 0 for active despite the image shoiwng a lot of bricks whatever experimental features i added sem to help]yesterday this one was allones and today its all zeroes
+
+
+
+
+#REQUIRES SERIOUS GERRYMANDERING !!!! CHECK THE LOGS ON ONENOTE
+model_pickle = './resources/slitter_model_jan20E5VanadiumExperimental.h5'###PERF IS GOOD#todo APPARENTLY THIS ONE WAS WRITTEN IN CATEGORICAL CROSS ENTROPY MIGHT BE PRETTY GOOD looks good on confidence as it predicted 0 as the asnwer where zero is active and 1 is inactive.... pretty smart
+
+
+
 '''
 #IS WORTHELESSS       model_pickle = './resources/basic_vanadium_sans_preproccing.h5'#todo guesses 1 even though it is active kinda dumb, not sure what went wrong, its twin did so much better, I forget how I trained it, docs are allmessed up but its proabley in the commmit history, regardless the paper journal has a better twin already described that trained under similar condtioins so .... meh?
 #IS WORTHELESSS       model_pickle = './resources/basic_vanadium_sans_preproccing.h5'####TODO THIS ONE i HAVE A BAD FEELING ABOUT[error duplicate above more notes...]
 # IS WORTHELESSS       model_pickle = './resources/basic_vanadium.h5'#todo he guesses 1 even though its inactive picture is of 2 bricks and one is currently engaged, this one must  be a renamed version basic vanadium sanspreproccing. idk I dont remember..... eitehr way I am fairly certain he is guessing inactive when is active and others are curretnly provideing the correct guess of active
 '''
 # model_pickle = './resources/slitter_model_jan20E5VanadiumExperimental.h5'###PERF IS GOOD#todo APPARENTLY THIS ONE WAS WRITTEN IN CATEGORICAL CROSS ENTROPY MIGHT BE PRETTY GOOD looks good on confidence as it predicted 0 as the asnwer where zero is active and 1 is inactive.... pretty smart
-model_pickle = './resources/slittercroppedmodel_vanadiumBase_v1.h5'
+
 
 finalRegion = ((0,305),(512,817))
 # define helper functions
@@ -167,7 +176,7 @@ async def get_frame(vcap, sample_rate):
                 print(state)
                 # state = np.argmax(state, axis=-1)
                 #todo reading is fundamental research the lead s on binary regression to make sure of thsi prediciton issue is secure
-                if state > 0.5:
+                if state[0][0] > 0.5:
                     #maybe its 0.0005
                     #maybe its 0.00038766
                     #0.0004
