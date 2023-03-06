@@ -29,7 +29,7 @@ caps_folder = project_id+'/'+camera_name
 
 # model_pickle = './resources/slitter_model_jan20E5VanadiumExperimental.h5'###PERF IS GOOD#todo APPARENTLY THIS ONE WAS WRITTEN IN CATEGORICAL CROSS ENTROPY MIGHT BE PRETTY GOOD looks good on confidence as it predicted 0 as the asnwer where zero is active and 1 is inactive.... pretty smart
 # model_pickle = './resources/WAVE2/slitter_model_batchNormsMany_dropout_v2.h5'
-
+model_pickle = './resources/WAVE1/slitter_model_jan20E5Basic.h5'
 finalRegion = ((0,305),(512,817))
 # define helper functions
 # ---------------------------------------------------------------------------------------------------------------------
