@@ -30,8 +30,9 @@ caps_folder = project_id+'/'+camera_name
 # model_pickle = './resources/slitter_model_jan20E5VanadiumExperimental.h5'###PERF IS GOOD#todo APPARENTLY THIS ONE WAS WRITTEN IN CATEGORICAL CROSS ENTROPY MIGHT BE PRETTY GOOD looks good on confidence as it predicted 0 as the asnwer where zero is active and 1 is inactive.... pretty smart
 # model_pickle = './resources/WAVE2/slitter_model_batchNormsMany_dropout_v2.h5'# is cropped
 # model_pickle = './resources/WAVE2/slitter_model_jan2E5version3Vanadium.h5'# the second one
-model_pickle = './resources/WAVE2/slitter_model_batchNormsMany_dropout_v2.h5'# wave 2 #3
-
+# model_pickle = './resources/WAVE2/slitter_model_batchNormsMany_dropout_v2.h5'# wave 2 #3
+# model_pickle = './resources/slitter_model_jan20E5Basic.h5'
+model_pickle = './resources/errant/wave0/slittercroppedmodel_vanadiumBase_v1.h5'
 
 # model_pickle = './resources/WAVE2/slittermodel_vanadiumBase_sansPreprocessing_wave1.h5'
 finalRegion = ((0,305),(512,817))
@@ -149,9 +150,9 @@ async def get_frame(vcap, sample_rate):
     none_cntr = 0
     while 1:
         # img = vcap.frame
-        img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_25_2023-02-02T14.05.15.015764.png')#this tests for active but there are 2 bars
+        # img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_25_2023-02-02T14.05.15.015764.png')#this tests for active but there are 2 bars
         # img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_24_2023-01-03T16.53.53.551760.png')#this tests for detecting a transtiotn state
-        # img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/active_1152.png')#this tests for pure active
+        img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/active_1152.png')#this tests for pure active
         # img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_2_2023-02-06T14.34.11.634378.png')#this tests for inactive purely
         if img is not None:
             img_original = img.copy()
