@@ -32,8 +32,8 @@ caps_folder = project_id+'/'+camera_name
 # model_pickle = './resources/WAVE2/slitter_model_jan2E5version3Vanadium.h5'# the second one
 # model_pickle = './resources/WAVE2/slitter_model_batchNormsMany_dropout_v2.h5'# wave 2 #3
 # model_pickle = './resources/slitter_model_jan20E5Basic.h5'
-model_pickle = './resources/errant/wave0/slittercroppedmodel_vanadiumBase_v1.h5'
-
+# model_pickle = './resources/errant/wave0/slittercroppedmodel_vanadiumBase_v1.h5'
+model_pickle = './resources/errant/wave0/slitter_model_vanadium_Wave1_many_batch.h5'
 # model_pickle = './resources/WAVE2/slittermodel_vanadiumBase_sansPreprocessing_wave1.h5'
 finalRegion = ((0,305),(512,817))
 # define helper functions
@@ -43,38 +43,11 @@ def make_folder(path):
         os.mkdir(path)
     except OSError as err:
         print('captures directory ' + caps_folder + ' exists')
-
 def get_img_list(folder):
     return os.listdir(folder)
-
-# class frame_getter:
-#     def __init__(self):
-#         self.new_frames = []
-#         self.new_frames_sobel = []
-#         self.getting_active = False
-#         self.imgs_df = pd.DataFrame(
-#             {
-#                 'fileday': [],
-#                 'filename': [],
-#                 'tags': []
-#             }
-#         )
-# ((457, 170), (535, 311))
-
 def imcrop(img, bounds):
     return img[bounds[0][0]:bounds[1][0],
            bounds[0][1]:bounds[1][1], :]
-#     def get_strip_values(self, img, sobel_k=3, n_stripes=15):
-#         imsobel = cv.Sobel(cv.cvtColor(img, cv.COLOR_BGR2GRAY), cv.CV_8U, 0, 1, ksize=sobel_k)
-#         rayscores = []
-#         for line in [0]+[math.floor(i * img.shape[1] / (n_stripes - 1)) for i in range(1, n_stripes-1)]+[img.shape[1]-1]:
-#             ray = [x for x in imsobel[:, line] if x > 0]
-#             # print(ray)
-#             if ray:
-#                 rayscores += [np.mean(ray) * np.max(ray) / 255]
-#             else:
-#                 rayscores += [0]
-#         return rayscores, imsobel
 '''
 this method can take a raw image and a set of coordinates.
 if the cropped region happens to be too big for whatever reason,
@@ -148,12 +121,31 @@ async def get_frame(vcap, sample_rate):
     slitter_last_state = 0
     slitter_state_current = 0
     none_cntr = 0
+    j_cnt = 0
     while 1:
         # img = vcap.frame
-        # img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_25_2023-02-02T14.05.15.015764.png')#this tests for active but there are 2 bars
-        # img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_24_2023-01-03T16.53.53.551760.png')#this tests for detecting a transtiotn state
-        img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/active_1152.png')#this tests for pure active
-        # img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_2_2023-02-06T14.34.11.634378.png')#this tests for inactive purely
+        if j_cnt == 0:
+            print('testing result for ::: ACTIVE 2 BARS -----------> ACTIVE ')
+            img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_25_2023-02-02T14.05.15.015764.png')#this tests for active but there are 2 bars
+        elif j_cnt == 1:
+            print('testing result for ::: TRANSITION -----------> INACTIVE ')
+            img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_24_2023-01-03T16.53.53.551760.png')#this tests for detecting a transtiotn state
+        elif j_cnt == 2:
+            print('testing result for ::: PURE ACTIVE -----------> ACTIVE ')
+            img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/active_1152.png')#this tests for pure active
+        elif j_cnt == 3:
+            print('testing result for ::: PURE INACTIVE -----------> INACTIVE ')
+            img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_2_2023-02-06T14.34.11.634378.png')#this tests for inactive purely
+        else:
+            print('TESTING LIVE BEHAVIOR')
+            img = vcap.frame
+        j_cnt += 1
+
+
+
+
+
+
         if img is not None:
             img_original = img.copy()
             none_cntr = 0
