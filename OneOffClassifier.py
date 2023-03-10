@@ -31,7 +31,13 @@ caps_folder = project_id+'/'+camera_name
 # model_pickle = './resources/WAVE2/slitter_model_batchNormsMany_dropout_v2.h5'
 # model_pickle = './resources/WAVE1/slitter_model_jan20E5Basic.h5'
 # model_pickle = './resources/errant/wave0/slittercroppedmodel_vanadiumBase_v1.h5'
-model_pickle = './resources/errant/wave0/slitter_model_vanadium_Wave1_many_batch.h5'
+# model_pickle = './resources/slittercroppedmodel_vanadiumBase_v1.h5'
+
+# model_pickle = './resources/errant/wave0/slitter_model_vanadium_Wave1_many_batch.h5'
+model_pickle = './resources/WAVE3_FINAL/slitter_model_BatchNorm1_v1.h5'
+
+
+
 
 # slitter_model_vanadium_Wave1_many_batch.h5
 finalRegion = ((0,305),(512,817))
@@ -90,7 +96,7 @@ def imCrop2(raw):
     ch, cw, cdep = croppedImg.shape
     # preProcced = tf.keras.applications.vgg16.preprocess_input(croppedImg)
     im = Image.fromarray(np.uint8(croppedImg))
-    im.show('cropped')
+    # im.show('cropped')
     im = Image.fromarray(np.uint8(croppedImg))
     # im.show('cropped')
     # if ch != 659 or cw != 959:
@@ -154,15 +160,40 @@ async def get_frame(vcap, sample_rate):
     slitter_last_state = 0
     slitter_state_current = 0
     none_cntr = 0
+    j_cnt = 0
     while 1:
         # img = vcap.frame
-        img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_25_2023-02-02T14.05.15.015764.png')#this tests for active but there are 2 bars
+        if j_cnt == 0:
+            print('testing result for ::: ACTIVE 2 BARS -----------> ACTIVE ')
+            img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_25_2023-02-02T14.05.15.015764.png')#this tests for active but there are 2 bars
+        elif j_cnt == 1:
+            print('testing result for ::: TRANSITION -----------> INACTIVE ')
+            img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_24_2023-01-03T16.53.53.551760.png')#this tests for detecting a transtiotn state
+        elif j_cnt == 2:
+            print('testing result for ::: PURE ACTIVE -----------> ACTIVE ')
+            img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/active_1152.png')#this tests for pure active
+        elif j_cnt == 3:
+            print('testing result for ::: PURE INACTIVE -----------> INACTIVE ')
+            img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_2_2023-02-06T14.34.11.634378.png')#this tests for inactive purely
+        else:
+            print('TESTING LIVE BEHAVIOR')
+            img = vcap.frame
+        j_cnt += 1
+
+
+
+
+
+
+
+        # img = vcap.frame
+        # img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_25_2023-02-02T14.05.15.015764.png')#this tests for active but there are 2 bars
         # img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_24_2023-01-03T16.53.53.551760.png')#this tests for detecting a transtiotn state
         # img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/active_1152.png')#this tests for pure active
         # img = cv.imread('./Slitter2BladePositionClassifier/Slitter2BladePositionClassifierCamera/raw/Cap_2_2023-02-06T14.34.11.634378.png')#this tests for inactive purely
 
 
-        img = img[:,:]
+        # img = img[:,:]
         if img is not None:
             img_original = img.copy()
             none_cntr = 0
